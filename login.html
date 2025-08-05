@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Kanban N2</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root {
+            --font-family: 'Poppins', sans-serif;
+            --card-bg: #2a2d4d;
+            --text-primary: #f0f0f0;
+            --text-secondary: #b0b8d1;
+            --accent-color: #4a90e2;
+            --accent-hover: #5aa1f2;
+            --success-color: #5aac44;
+            --error-color: #e53935;
+        }
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; height: 100vh; width: 100vw; z-index: -1;
+            background-image: url('https://i.imgur.com/55lGGhS.jpg'); background-size: cover; background-position: center; filter: blur(4px);
+        }
+        body {
+            font-family: var(--font-family); background-color: rgba(13, 17, 46, 0.7);
+            color: var(--text-primary); margin: 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 100vh;
+        }
+        .login-container {
+            background: rgba(22, 22, 38, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+        }
+        h1 { font-weight: 700; text-align: center; margin-top: 0; }
+        .tabs { display: flex; border-bottom: 1px solid var(--text-secondary); margin-bottom: 20px; }
+        .tab {
+            flex: 1; padding: 10px; text-align: center;
+            cursor: pointer; font-weight: 500;
+            border-bottom: 3px solid transparent;
+        }
+        .tab.active { border-bottom-color: var(--accent-color); }
+        form { display: none; flex-direction: column; gap: 15px; }
+        form.active { display: flex; }
+        .input-group { display: flex; flex-direction: column; }
+        label { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 5px; }
+        input {
+            background: rgba(0,0,0,0.2); border: 1px solid var(--text-secondary);
+            border-radius: 8px; padding: 12px; font-size: 1rem; color: var(--text-primary);
+        }
+        button {
+            background-color: var(--accent-color); color: white; border: none; padding: 12px;
+            border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px;
+            font-size: 1rem; transition: background-color 0.3s ease;
+        }
+        button:hover { background-color: var(--accent-hover); }
+        .message {
+            margin-top: 15px; text-align: center; padding: 10px;
+            border-radius: 5px; font-weight: 500;
+        }
+        .message.error { background-color: var(--error-color); }
+        .message.success { background-color: var(--success-color); }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Kanban N2</h1>
+        <div class="tabs">
+            <div class="tab active" data-form="signin">Entrar</div>
+            <div class="tab" data-form="signup">Criar Conta</div>
+        </div>
+
+        <form id="form-signin" class="active">
+            <div class="input-group">
+                <label for="signin-email">Email</label>
+                <input type="email" id="signin-email" required>
+            </div>
+            <div class="input-group">
+                <label for="signin-password">Senha</label>
+                <input type="password" id="signin-password" required>
+            </div>
+            <button type="submit">Entrar</button>
+        </form>
+
+        <form id="form-signup">
+            <div class="input-group">
+                <label for="signup-name">Nome Completo</label>
+                <input type="text" id="signup-name" required>
+            </div>
+            <div class="input-group">
+                <label for="signup-email">Email</label>
+                <input type="email" id="signup-email" required>
+            </div>
+            <div class="input-group">
+                <label for="signup-password">Crie uma Senha</label>
+                <input type="password" id="signup-password" required minlength="6">
+            </div>
+            <button type="submit">Criar Conta</button>
+        </form>
+        <div id="message-area" class="message" style="display: none;"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'COLE_SUA_URL_AQUI';
+        const SUPABASE_KEY = 'COLE_SUA_CHAVE_ANON_AQUI';
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const formSignin = document.getElementById('form-signin');
+        const formSignup = document.getElementById('form-signup');
+        const tabs = document.querySelectorAll('.tab');
+        const messageArea = document.getElementById('message-area');
+
+        // Lógica das abas
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                formSignin.classList.remove('active');
+                formSignup.classList.remove('active');
+                document.getElementById(`form-${tab.dataset.form}`).classList.add('active');
+            });
+        });
+
+        function showMessage(message, type = 'error') {
+            messageArea.textContent = message;
+            messageArea.className = `message ${type}`;
+            messageArea.style.display = 'block';
+        }
+
+        // Lógica de Cadastro (Sign Up)
+        formSignup.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+
+            const { data, error } = await sb.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: {
+                        full_name: name // Salva o nome do usuário nos metadados
+                    }
+                }
+            });
+
+            if (error) {
+                showMessage(`Erro: ${error.message}`);
+            } else {
+                showMessage('Conta criada com sucesso! Redirecionando...', 'success');
+                setTimeout(() => window.location.href = 'kanban.html', 1500);
+            }
+        });
+
+        // Lógica de Login (Sign In)
+        formSignin.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('signin-email').value;
+            const password = document.getElementById('signin-password').value;
+
+            const { data, error } = await sb.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+
+            if (error) {
+                showMessage(`Erro: ${error.message}`);
+            } else if (data.session) {
+                window.location.href = 'kanban.html';
+            }
+        });
+    </script>
+</body>
+</html>
