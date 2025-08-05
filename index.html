@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NuCel</title>
+    <title>NuCel - Equipe N2</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
@@ -15,9 +15,9 @@
         :root {
             --font-family: 'Poppins', sans-serif;
             --column-bg: rgba(22, 22, 38, 0.4);
-            --card-bg: #1f2240;
+            --card-bg: #2a2d4d; /* Um pouco mais claro para contraste */
             --text-primary: #f0f0f0;
-            --text-secondary: #a0a0b0;
+            --text-secondary: #b0b8d1;
             --accent-color: #4a90e2;
             --accent-hover: #5aa1f2;
             --success-color: #5aac44;
@@ -27,206 +27,114 @@
             --border-color: rgba(255, 255, 255, 0.15);
             --border-radius: 12px;
         }
-
-        @keyframes card-add-anim {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
         body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0;
-            height: 100vh; width: 100vw;
-            z-index: -1;
-            background-image: url('https://i.imgur.com/55lGGhS.jpg');
-            background-size: cover;
-            background-position: center;
-            filter: blur(4px);
+            content: ''; position: fixed; top: 0; left: 0; height: 100vh; width: 100vw; z-index: -1;
+            background-image: url('https://i.imgur.com/55lGGhS.jpg'); background-size: cover; background-position: center; filter: blur(4px);
         }
-
         body {
-            font-family: var(--font-family);
-            background-color: rgba(13, 17, 46, 0.7);
-            color: var(--text-primary);
-            margin: 0;
-            padding: 25px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            box-sizing: border-box;
+            font-family: var(--font-family); background-color: rgba(13, 17, 46, 0.7); color: var(--text-primary);
+            margin: 0; padding: 25px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; box-sizing: border-box;
         }
+        h1 { font-weight: 700; font-size: 2.5rem; text-shadow: 0 2px 10px var(--shadow-color); margin-bottom: 30px; }
+        .kanban-board { display: flex; gap: 25px; width: 100%; max-width: 1800px; align-items: flex-start; overflow-x: auto; padding: 20px 10px; }
+        .kanban-column { background: var(--column-bg); border: 1px solid var(--border-color); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-radius: var(--border-radius); padding: 15px; min-width: 320px; width: 320px; display: flex; flex-direction: column; gap: 20px;
+        }
+        .kanban-column h2 { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin: 0; padding: 0 5px; }
+        .cards-container { display: flex; flex-direction: column; gap: 15px; min-height: 100px; }
         
-        h1 {
-            font-weight: 600;
-            font-size: 2.5rem;
-            text-shadow: 0 2px 10px var(--shadow-color);
-            margin-bottom: 30px;
-        }
-
-        ::-webkit-scrollbar { width: 10px; height: 10px; }
-        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--accent-hover); }
-
-        .kanban-board {
-            display: flex;
-            gap: 25px;
-            width: 100%;
-            max-width: 1800px;
-            align-items: flex-start;
-            overflow-x: auto;
-            padding: 20px 10px;
-        }
-
-        .kanban-column {
-            background: var(--column-bg);
-            border: 1px solid var(--border-color);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: var(--border-radius);
-            padding: 15px;
-            min-width: 320px;
-            width: 320px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .kanban-column h2 {
-            font-size: 1.1rem;
-            font-weight: 500;
-            color: var(--text-primary);
-            margin: 0;
-            padding: 0 5px;
-        }
-
-        .cards-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            min-height: 100px;
-        }
-
         .card {
-            background-color: var(--card-bg);
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 4px 15px var(--shadow-color);
-            cursor: grab;
-            position: relative;
-            border: 1px solid transparent;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-            animation: card-add-anim 0.4s ease;
+            background-color: var(--card-bg); border-radius: 8px; padding: 15px; box-shadow: 0 4px 15px var(--shadow-color);
+            cursor: grab; position: relative; border: 1px solid transparent; transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px var(--shadow-color); border-color: var(--accent-color); }
+
+        .card-labels { display: flex; flex-wrap: wrap; gap: 6px; }
+        .card-label {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
         }
 
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px var(--shadow-color);
-            border-color: var(--accent-color);
+        .card-text { font-size: 0.95rem; font-weight: 500; line-height: 1.4; cursor: pointer; }
+
+        .card-description-snippet {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            max-height: 50px;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .card:active { cursor: grabbing; }
-
-        .card.dragging { opacity: 0.6; transform: scale(1.05); }
-
-        .card-labels { display: flex; gap: 6px; margin-bottom: 10px; }
-        .card-label { width: 35px; height: 6px; border-radius: 3px; }
-        .card-text { font-size: 0.9rem; font-weight: 400; line-height: 1.5; cursor: pointer; }
+        .card-footer {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .card-owner {
+            width: 28px; height: 28px; border-radius: 50%;
+            background-color: #777; color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem; font-weight: 600; text-transform: uppercase;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
 
         .delete-card {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            cursor: pointer;
-            color: var(--text-secondary);
-            font-size: 1.2rem;
-            opacity: 0;
-            transition: opacity 0.3s ease, color 0.3s ease;
+            position: absolute; top: 10px; right: 10px; cursor: pointer; color: var(--text-secondary);
+            font-size: 1.2rem; opacity: 0; transition: opacity 0.3s ease, color 0.3s ease;
         }
-
         .card:hover .delete-card { opacity: 1; }
         .delete-card:hover { color: var(--delete-color); }
 
         .add-card-form { display: flex; }
         .add-card-input {
-            width: 100%;
-            background: rgba(0,0,0,0.2);
-            border: 1px solid var(--border-color);
-            border-radius: 8px 0 0 8px;
-            padding: 10px 15px;
-            font-size: 0.9rem;
-            color: var(--text-primary);
-            outline: none;
+            width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 8px 0 0 8px;
+            padding: 10px 15px; font-size: 0.9rem; color: var(--text-primary); outline: none;
         }
-        .add-card-input::placeholder { color: var(--text-secondary); }
-        .add-card-input:focus { background: rgba(0,0,0,0.4); }
-
         .add-card-btn {
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            border-radius: 0 8px 8px 0;
-            padding: 0 18px;
-            cursor: pointer;
-            font-size: 1.5rem;
-            transition: background-color 0.3s ease;
+            background-color: var(--accent-color); color: white; border: none; border-radius: 0 8px 8px 0;
+            padding: 0 18px; cursor: pointer; font-size: 1.5rem;
         }
-        .add-card-btn:hover { background-color: var(--accent-hover); }
         
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: none; justify-content: center; align-items: center;
-            z-index: 1000; opacity: 0; transition: opacity 0.3s ease;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5);
+            display: none; justify-content: center; align-items: center; z-index: 1000;
+            opacity: 0; transition: opacity 0.3s ease;
         }
         .modal-overlay.visible { display: flex; opacity: 1; }
         
         .modal-content {
-            background: var(--column-bg);
-            border: 1px solid var(--border-color);
-            backdrop-filter: blur(15px);
-            padding: 30px;
-            border-radius: var(--border-radius);
-            width: 90%;
-            max-width: 650px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-            position: relative;
-            transform: scale(0.95);
-            transition: transform 0.3s ease;
+            background: var(--column-bg); border: 1px solid var(--border-color); backdrop-filter: blur(15px);
+            padding: 30px; border-radius: var(--border-radius); width: 90%; max-width: 650px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4); position: relative;
+            transform: scale(0.95); transition: transform 0.3s ease;
         }
         .modal-overlay.visible .modal-content { transform: scale(1); }
+        .modal-close { position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; }
         
-        .modal-close {
-            position: absolute; top: 15px; right: 20px;
-            font-size: 2rem; cursor: pointer; color: var(--text-secondary);
-            transition: color 0.3s ease, transform 0.3s ease;
+        .modal-field { margin-top: 20px; }
+        .modal-field strong, .modal-field h4 { font-weight: 600; color: var(--text-secondary); margin-bottom: 10px; }
+        .modal-content input[type="text"], .modal-content textarea {
+            width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 12px; font-size: 0.9rem; color: var(--text-primary);
+            box-sizing: border-box; margin-top: 5px;
         }
-        .modal-close:hover { color: var(--text-primary); transform: rotate(90deg); }
-        
-        .modal-content h3 { margin-top: 0; font-weight: 500; font-size: 1.5rem; }
-        .modal-content p { font-weight: 500; color: var(--text-secondary); margin-bottom: 5px; margin-top: 20px; }
-        .modal-content textarea {
-            width: 100%; min-height: 120px; background: rgba(0,0,0,0.2);
-            border: 1px solid var(--border-color); border-radius: 8px;
-            padding: 15px; font-size: 0.9rem; color: var(--text-primary);
-            box-sizing: border-box; resize: vertical;
-        }
-        
-        .modal-labels-container h4 { font-weight: 500; margin-bottom: 15px; margin-top: 25px; }
-        .modal-labels { display: flex; gap: 15px; flex-wrap: wrap; }
-        .modal-label {
-            width: 60px; height: 35px; border-radius: 8px; cursor: pointer;
-            border: 3px solid transparent; transition: transform 0.2s ease, border-color 0.2s ease;
-        }
-        .modal-label.selected { border-color: var(--accent-color); transform: scale(1.1); }
-        
+        .modal-content textarea { min-height: 120px; resize: vertical; }
+
+        .modal-labels { display: flex; flex-direction: column; gap: 8px; }
+        .modal-label-option { display: flex; align-items: center; cursor: pointer; padding: 5px; border-radius: 5px; }
+        .modal-label-option:hover { background: rgba(255,255,255,0.1); }
+        .modal-label-option input { margin-right: 10px; }
+        .modal-label-option .card-label { margin-left: auto; }
+
         .modal-save-btn {
-            background-color: var(--success-color); color: white; border: none;
-            padding: 12px 25px; border-radius: 8px; font-weight: 500;
-            cursor: pointer; margin-top: 30px; font-size: 1rem;
-            transition: background-color 0.3s ease, transform 0.3s ease;
+            background-color: var(--success-color); color: white; border: none; padding: 12px 25px;
+            border-radius: 8px; font-weight: 500; cursor: pointer; margin-top: 30px;
+            font-size: 1rem; transition: background-color 0.3s ease, transform 0.3s ease;
         }
         .modal-save-btn:hover { background-color: var(--success-hover); transform: translateY(-2px); }
     </style>
@@ -237,34 +145,22 @@
         <div class="kanban-column">
             <h2>Atividade</h2>
             <div class="cards-container" data-column-id="todo-cards"></div>
-            <form class="add-card-form">
-                <input type="text" class="add-card-input" placeholder="Nova atividade...">
-                <button type="submit" class="add-card-btn">+</button>
-            </form>
+            <form class="add-card-form"><input type="text" class="add-card-input" placeholder="Nova atividade..."><button type="submit" class="add-card-btn">+</button></form>
         </div>
         <div class="kanban-column">
             <h2>Em andamento</h2>
             <div class="cards-container" data-column-id="inprogress-cards"></div>
-            <form class="add-card-form">
-                <input type="text" class="add-card-input" placeholder="Nova atividade...">
-                <button type="submit" class="add-card-btn">+</button>
-            </form>
+            <form class="add-card-form"><input type="text" class="add-card-input" placeholder="Nova atividade..."><button type="submit" class="add-card-btn">+</button></form>
         </div>
         <div class="kanban-column">
             <h2>Pendente</h2>
             <div class="cards-container" data-column-id="pending-cards"></div>
-            <form class="add-card-form">
-                <input type="text" class="add-card-input" placeholder="Nova atividade...">
-                <button type="submit" class="add-card-btn">+</button>
-            </form>
+            <form class="add-card-form"><input type="text" class="add-card-input" placeholder="Nova atividade..."><button type="submit" class="add-card-btn">+</button></form>
         </div>
         <div class="kanban-column">
             <h2>Concluído</h2>
             <div class="cards-container" data-column-id="done-cards"></div>
-            <form class="add-card-form">
-                <input type="text" class="add-card-input" placeholder="Nova atividade...">
-                <button type="submit" class="add-card-btn">+</button>
-            </form>
+            <form class="add-card-form"><input type="text" class="add-card-input" placeholder="Nova atividade..."><button type="submit" class="add-card-btn">+</button></form>
         </div>
     </div>
     
@@ -272,12 +168,9 @@
         <div class="modal-content">
             <span class="modal-close" id="modal-close-btn">&times;</span>
             <h3 id="modal-title"></h3>
-            <p><strong>Descrição</strong></p>
-            <textarea id="modal-description" placeholder="Adicione uma descrição mais detalhada..."></textarea>
-            <div class="modal-labels-container">
-                <h4>Etiquetas (Tags)</h4>
-                <div class="modal-labels" id="modal-labels"></div>
-            </div>
+            <div class="modal-field"><p><strong>Responsável (Owner)</strong></p><input type="text" id="modal-owner" placeholder="Nome completo do responsável"></div>
+            <div class="modal-field"><p><strong>Descrição</strong></p><textarea id="modal-description" placeholder="Adicione uma descrição mais detalhada..."></textarea></div>
+            <div class="modal-field"><h4>Etiquetas (Tags)</h4><div class="modal-labels" id="modal-labels"></div></div>
             <button class="modal-save-btn" id="modal-save-btn">Salvar Alterações</button>
         </div>
     </div>
@@ -293,20 +186,23 @@
             let draggedCard = null;
             let currentEditingCard = null;
 
-            const LABEL_COLORS = {
-                green: '#61bd4f', yellow: '#f2d600', orange: '#ff9f1a',
-                red: '#eb5a46', purple: '#c377e0', blue: '#0079bf'
+            const LABEL_DEFINITIONS = {
+                pending: { text: 'Pendente', color: '#E0E0E0', textColor: '#000' },
+                low:     { text: 'Prioridade Baixa', color: '#43a047', textColor: '#fff' },
+                medium:  { text: 'Prioridade Média', color: '#ffb300', textColor: '#000' },
+                high:    { text: 'Prioridade Alta', color: '#f4511e', textColor: '#fff' },
+                urgent:  { text: 'Isto é pra ontem!', color: '#8e24aa', textColor: '#fff' },
             };
-            
-            // --- FUNÇÕES DE LÓGICA DO SUPABASE ---
 
+            const AVATAR_COLORS = [
+                '#e53935', '#d81b60', '#8e24aa', '#5e35b1', '#3949ab', '#1e88e5', '#039be5', '#00acc1', 
+                '#00897b', '#43a047', '#7cb342', '#c0ca33', '#fdd835', '#ffb300', '#fb8c00', '#f4511e', 
+                '#6d4c41', '#757575', '#546e7a'
+            ];
+            
             async function loadCardsFromDB() {
                 const { data: cards, error } = await sb.from('cards').select('*').order('created_at', { ascending: true });
-                if (error) {
-                    console.error('ERRO AO CARREGAR CARDS:', error);
-                    alert("Não foi possível carregar os cards. Verifique o console (F12) para mais detalhes.");
-                    return;
-                }
+                if (error) { console.error('ERRO AO CARREGAR CARDS:', error); return; }
                 cardContainers.forEach(c => c.innerHTML = '');
                 cards.forEach(cardData => {
                     const container = document.querySelector(`.cards-container[data-column-id="${cardData.column_id}"]`);
@@ -319,11 +215,7 @@
 
             async function addCardToDB(text, columnId) {
                 const { data, error } = await sb.from('cards').insert([{ text, column_id: columnId }]).select();
-                if (error) {
-                    console.error('ERRO AO ADICIONAR CARD:', error);
-                    alert("Falha ao adicionar o card. Verifique o console (F12) e as configurações do Supabase (RLS, Nomes de Coluna).");
-                    return null;
-                }
+                if (error) { console.error('ERRO AO ADICIONAR CARD:', error); return null; }
                 return data[0];
             }
             
@@ -336,8 +228,22 @@
                 const { error } = await sb.from('cards').update(updates).eq('id', cardId);
                 if (error) console.error('ERRO AO ATUALIZAR CARD:', error);
             }
+            
+            function getInitials(name) {
+                if (!name) return '';
+                const parts = name.trim().split(' ').filter(Boolean);
+                if (parts.length === 0) return '';
+                if (parts.length === 1) return parts[0].substring(0, 2);
+                return parts[0][0] + parts[parts.length - 1][0];
+            }
 
-            // --- FUNÇÕES DE MANIPULAÇÃO DO DOM (INTERFACE) ---
+            function getColorForName(name) {
+                if (!name) return '#777';
+                let hash = 0;
+                for (let i = 0; i < name.length; i++) { hash = name.charCodeAt(i) + ((hash << 5) - hash); }
+                const index = Math.abs(hash % AVATAR_COLORS.length);
+                return AVATAR_COLORS[index];
+            }
 
             function createCardElement(cardData) {
                 const card = document.createElement('div');
@@ -347,22 +253,77 @@
                 card.dataset.description = cardData.description || '';
                 card.dataset.labels = JSON.stringify(cardData.labels || []);
                 card.dataset.columnId = cardData.column_id;
+                card.dataset.owner = cardData.owner || '';
                 
                 const labelsContainer = document.createElement('div');
                 labelsContainer.className = 'card-labels';
-                
                 const cardText = document.createElement('div');
                 cardText.className = 'card-text';
                 cardText.textContent = cardData.text;
-                
+                const descriptionSnippet = document.createElement('p');
+                descriptionSnippet.className = 'card-description-snippet';
+                const cardFooter = document.createElement('div');
+                cardFooter.className = 'card-footer';
                 const deleteBtn = document.createElement('span');
                 deleteBtn.className = 'delete-card';
                 deleteBtn.innerHTML = '&times;';
 
-                card.append(labelsContainer, cardText, deleteBtn);
-                updateCardLabels(card);
+                card.append(labelsContainer, cardText, descriptionSnippet, cardFooter, deleteBtn);
+                
+                updateCardUI(card);
                 addEventListenersToCard(card);
                 return card;
+            }
+            
+            function updateCardUI(card) {
+                updateCardLabels(card);
+                updateCardDescriptionSnippet(card);
+                updateCardOwnerDisplay(card);
+            }
+
+            function updateCardLabels(card) {
+                const labelsContainer = card.querySelector('.card-labels');
+                const labelKeys = JSON.parse(card.dataset.labels || '[]');
+                labelsContainer.innerHTML = '';
+                labelKeys.forEach(key => {
+                    const labelInfo = LABEL_DEFINITIONS[key];
+                    if (labelInfo) {
+                        const labelDiv = document.createElement('span');
+                        labelDiv.className = 'card-label';
+                        labelDiv.textContent = labelInfo.text;
+                        labelDiv.style.backgroundColor = labelInfo.color;
+                        labelDiv.style.color = labelInfo.textColor;
+                        labelsContainer.appendChild(labelDiv);
+                    }
+                });
+            }
+
+            function updateCardDescriptionSnippet(card) {
+                const snippetP = card.querySelector('.card-description-snippet');
+                const fullDesc = card.dataset.description;
+                if (fullDesc && snippetP) {
+                    snippetP.textContent = fullDesc.length > 100 ? fullDesc.substring(0, 100) + '...' : fullDesc;
+                } else if(snippetP) {
+                    snippetP.textContent = '';
+                }
+            }
+            
+            function updateCardOwnerDisplay(card) {
+                const cardFooter = card.querySelector('.card-footer');
+                let ownerAvatar = cardFooter.querySelector('.card-owner');
+                if (!ownerAvatar) {
+                    ownerAvatar = document.createElement('div');
+                    ownerAvatar.className = 'card-owner';
+                    cardFooter.appendChild(ownerAvatar);
+                }
+                const ownerName = card.dataset.owner;
+                if (ownerName) {
+                    ownerAvatar.textContent = getInitials(ownerName);
+                    ownerAvatar.style.backgroundColor = getColorForName(ownerName);
+                    ownerAvatar.style.display = 'flex';
+                } else {
+                    ownerAvatar.style.display = 'none';
+                }
             }
             
             function addEventListenersToCard(card) {
@@ -376,7 +337,6 @@
                     draggedCard.classList.remove('dragging');
                     const newColumnId = draggedCard.parentElement.dataset.columnId;
                     const cardId = draggedCard.dataset.id;
-                    
                     if (draggedCard.dataset.columnId !== newColumnId) {
                         draggedCard.dataset.columnId = newColumnId;
                         await updateCardInDB(cardId, { column_id: newColumnId });
@@ -389,15 +349,12 @@
                 card.querySelector('.delete-card').addEventListener('click', async (e) => {
                     e.stopPropagation();
                     if (confirm('Tem certeza que deseja deletar este card?')) {
-                        const cardId = card.dataset.id;
-                        await deleteCardFromDB(cardId);
+                        await deleteCardFromDB(card.dataset.id);
                         card.remove();
                     }
                 });
             }
             
-            // --- EVENTOS PRINCIPAIS ---
-
             forms.forEach(form => {
                 form.addEventListener('submit', async (e) => {
                     e.preventDefault();
@@ -405,7 +362,6 @@
                     const text = input.value.trim();
                     const container = form.previousElementSibling;
                     const columnId = container.dataset.columnId;
-
                     if (text && columnId) {
                         const newCardData = await addCardToDB(text, columnId);
                         if (newCardData) {
@@ -416,25 +372,22 @@
                     }
                 });
             });
-            
+
             cardContainers.forEach(container => {
                 container.addEventListener('dragover', (e) => {
                     e.preventDefault();
                     const afterElement = getDragAfterElement(container, e.clientY);
                     const currentDraggingCard = document.querySelector('.dragging');
                     if(currentDraggingCard){
-                        if (afterElement == null) {
-                            container.appendChild(currentDraggingCard);
-                        } else {
-                            container.insertBefore(currentDraggingCard, afterElement);
-                        }
+                        if (afterElement == null) container.appendChild(currentDraggingCard);
+                        else container.insertBefore(currentDraggingCard, afterElement);
                     }
                 });
             });
 
-            // --- LÓGICA DO MODAL (COMPLETA) ---
             const modal = document.getElementById('card-modal');
             const modalTitle = document.getElementById('modal-title');
+            const modalOwner = document.getElementById('modal-owner');
             const modalDescription = document.getElementById('modal-description');
             const modalLabels = document.getElementById('modal-labels');
             const modalCloseBtn = document.getElementById('modal-close-btn');
@@ -443,77 +396,71 @@
             function openModal(card) {
                 currentEditingCard = card;
                 modalTitle.textContent = card.querySelector('.card-text').textContent;
+                modalOwner.value = card.dataset.owner || '';
                 modalDescription.value = card.dataset.description || '';
                 
                 modalLabels.innerHTML = '';
-                const currentLabels = JSON.parse(card.dataset.labels || '[]');
-                Object.values(LABEL_COLORS).forEach(color => {
-                    const labelDiv = document.createElement('div');
-                    labelDiv.className = 'modal-label';
-                    labelDiv.style.backgroundColor = color;
-                    labelDiv.dataset.color = color;
-                    if (currentLabels.includes(color)) {
-                        labelDiv.classList.add('selected');
-                    }
-                    labelDiv.addEventListener('click', () => labelDiv.classList.toggle('selected'));
-                    modalLabels.appendChild(labelDiv);
+                const currentLabelKeys = JSON.parse(card.dataset.labels || '[]');
+                Object.keys(LABEL_DEFINITIONS).forEach(key => {
+                    const labelInfo = LABEL_DEFINITIONS[key];
+                    const labelOption = document.createElement('label');
+                    labelOption.className = 'modal-label-option';
+
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.value = key;
+                    if (currentLabelKeys.includes(key)) checkbox.checked = true;
+
+                    const labelText = document.createElement('span');
+                    labelText.textContent = ` ${labelInfo.text}`;
+
+                    const labelPreview = document.createElement('span');
+                    labelPreview.className = 'card-label';
+                    labelPreview.textContent = labelInfo.text;
+                    labelPreview.style.backgroundColor = labelInfo.color;
+                    labelPreview.style.color = labelInfo.textColor;
+
+                    labelOption.append(checkbox, labelText, labelPreview);
+                    modalLabels.appendChild(labelOption);
                 });
                 modal.classList.add('visible');
             }
 
-            function closeModal() {
-                modal.classList.remove('visible');
-            }
+            function closeModal() { modal.classList.remove('visible'); }
             
             modalSaveBtn.addEventListener('click', async () => {
                 if (!currentEditingCard) return;
-
                 const cardId = currentEditingCard.dataset.id;
-                const newDescription = modalDescription.value;
-                const selectedLabels = Array.from(modalLabels.querySelectorAll('.modal-label.selected'))
-                                            .map(el => el.dataset.color);
                 
-                const updates = { description: newDescription, labels: selectedLabels };
+                const updates = {
+                    owner: modalOwner.value.trim(),
+                    description: modalDescription.value.trim(),
+                    labels: Array.from(modalLabels.querySelectorAll('input:checked')).map(el => el.value)
+                };
+                
                 await updateCardInDB(cardId, updates);
                 
-                currentEditingCard.dataset.description = newDescription;
-                currentEditingCard.dataset.labels = JSON.stringify(selectedLabels);
-                updateCardLabels(currentEditingCard);
+                currentEditingCard.dataset.owner = updates.owner;
+                currentEditingCard.dataset.description = updates.description;
+                currentEditingCard.dataset.labels = JSON.stringify(updates.labels);
+                
+                updateCardUI(currentEditingCard);
                 closeModal();
             });
 
             modalCloseBtn.addEventListener('click', closeModal);
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) closeModal();
-            });
-
-            // --- FUNÇÕES HELPER (COMPLETAS) ---
-            function updateCardLabels(card) {
-                const labelsContainer = card.querySelector('.card-labels');
-                const labels = JSON.parse(card.dataset.labels || '[]');
-                labelsContainer.innerHTML = '';
-                labels.forEach(color => {
-                    const labelDiv = document.createElement('div');
-                    labelDiv.className = 'card-label';
-                    labelDiv.style.backgroundColor = color;
-                    labelsContainer.appendChild(labelDiv);
-                });
-            }
+            modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 
             function getDragAfterElement(container, y) {
                 const draggableElements = [...container.querySelectorAll('.card:not(.dragging)')];
                 return draggableElements.reduce((closest, child) => {
                     const box = child.getBoundingClientRect();
                     const offset = y - box.top - box.height / 2;
-                    if (offset < 0 && offset > closest.offset) {
-                        return { offset: offset, element: child };
-                    } else {
-                        return closest;
-                    }
+                    if (offset < 0 && offset > closest.offset) return { offset, element: child };
+                    else return closest;
                 }, { offset: Number.NEGATIVE_INFINITY }).element;
             }
 
-            // --- INICIALIZAÇÃO DA APLICAÇÃO ---
             loadCardsFromDB();
         });
     </script>
