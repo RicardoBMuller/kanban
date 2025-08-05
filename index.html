@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NuCel - Kanban N2</title>
+    <title>NuCel</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
-        /* --- ESTILOS GERAIS E TEMA MODERNO COM BACKGROUND --- */
         :root {
             --font-family: 'Poppins', sans-serif;
-            --column-bg: rgba(22, 22, 38, 0.4); /* Cor mais opaca para melhor contraste */
+            --column-bg: rgba(22, 22, 38, 0.4);
             --card-bg: #1f2240;
             --text-primary: #f0f0f0;
             --text-secondary: #a0a0b0;
@@ -28,34 +29,25 @@
         }
 
         @keyframes card-add-anim {
-            from {
-                transform: scale(0.8);
-                opacity: 0;
-            }
-            to {
-                transform: scale(1);
-                opacity: 1;
-            }
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
 
         body::before {
             content: '';
             position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            width: 100vw;
+            top: 0; left: 0;
+            height: 100vh; width: 100vw;
             z-index: -1;
             background-image: url('https://i.imgur.com/55lGGhS.jpg');
             background-size: cover;
             background-position: center;
-            background-repeat: no-repeat;
-            filter: blur(4px); /* Desfoque aplicado apenas no pseudo-elemento */
+            filter: blur(4px);
         }
 
         body {
             font-family: var(--font-family);
-            background-color: rgba(13, 17, 46, 0.7); /* Cor sobre a imagem para escurecer */
+            background-color: rgba(13, 17, 46, 0.7);
             color: var(--text-primary);
             margin: 0;
             padding: 25px;
@@ -73,24 +65,11 @@
             margin-bottom: 30px;
         }
 
-        /* Estilização da Barra de Rolagem */
-        ::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.2);
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--accent-color);
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-hover);
-        }
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-hover); }
 
-        /* --- LAYOUT DO KANBAN --- */
         .kanban-board {
             display: flex;
             gap: 25px;
@@ -104,7 +83,7 @@
         .kanban-column {
             background: var(--column-bg);
             border: 1px solid var(--border-color);
-            backdrop-filter: blur(12px); /* Efeito de vidro! */
+            backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border-radius: var(--border-radius);
             padding: 15px;
@@ -130,7 +109,6 @@
             min-height: 100px;
         }
 
-        /* --- CARD E SEUS EFEITOS --- */
         .card {
             background-color: var(--card-bg);
             border-radius: 8px;
@@ -149,33 +127,13 @@
             border-color: var(--accent-color);
         }
 
-        .card:active {
-            cursor: grabbing;
-        }
+        .card:active { cursor: grabbing; }
 
-        .card.dragging {
-            opacity: 0.6;
-            transform: scale(1.05);
-        }
+        .card.dragging { opacity: 0.6; transform: scale(1.05); }
 
-        .card-labels {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 10px;
-        }
-
-        .card-label {
-            width: 35px;
-            height: 6px;
-            border-radius: 3px;
-        }
-
-        .card-text {
-            font-size: 0.9rem;
-            font-weight: 400;
-            line-height: 1.5;
-            cursor: pointer;
-        }
+        .card-labels { display: flex; gap: 6px; margin-bottom: 10px; }
+        .card-label { width: 35px; height: 6px; border-radius: 3px; }
+        .card-text { font-size: 0.9rem; font-weight: 400; line-height: 1.5; cursor: pointer; }
 
         .delete-card {
             position: absolute;
@@ -188,19 +146,10 @@
             transition: opacity 0.3s ease, color 0.3s ease;
         }
 
-        .card:hover .delete-card {
-            opacity: 1;
-        }
-        
-        .delete-card:hover {
-            color: var(--delete-color);
-        }
+        .card:hover .delete-card { opacity: 1; }
+        .delete-card:hover { color: var(--delete-color); }
 
-        /* --- FORMULÁRIO DE NOVO CARD --- */
-        .add-card-form {
-            display: flex;
-        }
-
+        .add-card-form { display: flex; }
         .add-card-input {
             width: 100%;
             background: rgba(0,0,0,0.2);
@@ -210,16 +159,9 @@
             font-size: 0.9rem;
             color: var(--text-primary);
             outline: none;
-            transition: background-color 0.3s ease;
         }
-
-        .add-card-input::placeholder {
-            color: var(--text-secondary);
-        }
-        
-        .add-card-input:focus {
-            background: rgba(0,0,0,0.4);
-        }
+        .add-card-input::placeholder { color: var(--text-secondary); }
+        .add-card-input:focus { background: rgba(0,0,0,0.4); }
 
         .add-card-btn {
             background-color: var(--accent-color);
@@ -229,40 +171,22 @@
             padding: 0 18px;
             cursor: pointer;
             font-size: 1.5rem;
-            font-weight: 300;
             transition: background-color 0.3s ease;
         }
-
-        .add-card-btn:hover {
-            background-color: var(--accent-hover);
-        }
+        .add-card-btn:hover { background-color: var(--accent-hover); }
         
-        /* --- MODAL DE EDIÇÃO --- */
         .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5); /* Overlay para o modal */
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none; justify-content: center; align-items: center;
+            z-index: 1000; opacity: 0; transition: opacity 0.3s ease;
         }
-
-        .modal-overlay.visible {
-            display: flex;
-            opacity: 1;
-        }
+        .modal-overlay.visible { display: flex; opacity: 1; }
         
         .modal-content {
             background: var(--column-bg);
             border: 1px solid var(--border-color);
             backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
             padding: 30px;
             border-radius: var(--border-radius);
             width: 90%;
@@ -272,102 +196,45 @@
             transform: scale(0.95);
             transition: transform 0.3s ease;
         }
-        
-        .modal-overlay.visible .modal-content {
-            transform: scale(1);
-        }
+        .modal-overlay.visible .modal-content { transform: scale(1); }
         
         .modal-close {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 2rem;
-            font-weight: 300;
-            cursor: pointer;
-            color: var(--text-secondary);
+            position: absolute; top: 15px; right: 20px;
+            font-size: 2rem; cursor: pointer; color: var(--text-secondary);
             transition: color 0.3s ease, transform 0.3s ease;
         }
-
-        .modal-close:hover {
-            color: var(--text-primary);
-            transform: rotate(90deg);
-        }
+        .modal-close:hover { color: var(--text-primary); transform: rotate(90deg); }
         
-        .modal-content h3 {
-            margin-top: 0;
-            font-weight: 500;
-            font-size: 1.5rem;
-        }
-
-        .modal-content p {
-            font-weight: 500;
-            color: var(--text-secondary);
-            margin-bottom: 5px;
-            margin-top: 20px;
-        }
-
+        .modal-content h3 { margin-top: 0; font-weight: 500; font-size: 1.5rem; }
+        .modal-content p { font-weight: 500; color: var(--text-secondary); margin-bottom: 5px; margin-top: 20px; }
         .modal-content textarea {
-            width: 100%;
-            min-height: 120px;
-            background: rgba(0,0,0,0.2);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 15px;
-            font-size: 0.9rem;
-            color: var(--text-primary);
-            box-sizing: border-box;
-            resize: vertical;
+            width: 100%; min-height: 120px; background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color); border-radius: 8px;
+            padding: 15px; font-size: 0.9rem; color: var(--text-primary);
+            box-sizing: border-box; resize: vertical;
         }
         
-        .modal-labels-container h4 {
-            font-weight: 500;
-            margin-bottom: 15px;
-            margin-top: 25px;
-        }
-        
-        .modal-labels {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        
+        .modal-labels-container h4 { font-weight: 500; margin-bottom: 15px; margin-top: 25px; }
+        .modal-labels { display: flex; gap: 15px; flex-wrap: wrap; }
         .modal-label {
-            width: 60px;
-            height: 35px;
-            border-radius: 8px;
-            cursor: pointer;
-            border: 3px solid transparent;
-            transition: transform 0.2s ease, border-color 0.2s ease;
+            width: 60px; height: 35px; border-radius: 8px; cursor: pointer;
+            border: 3px solid transparent; transition: transform 0.2s ease, border-color 0.2s ease;
         }
-        
-        .modal-label.selected {
-            border-color: var(--accent-color);
-            transform: scale(1.1);
-        }
+        .modal-label.selected { border-color: var(--accent-color); transform: scale(1.1); }
         
         .modal-save-btn {
-            background-color: var(--success-color);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            font-weight: 500;
-            cursor: pointer;
-            margin-top: 30px;
-            font-size: 1rem;
+            background-color: var(--success-color); color: white; border: none;
+            padding: 12px 25px; border-radius: 8px; font-weight: 500;
+            cursor: pointer; margin-top: 30px; font-size: 1rem;
             transition: background-color 0.3s ease, transform 0.3s ease;
         }
-        
-        .modal-save-btn:hover {
-            background-color: var(--success-hover);
-            transform: translateY(-2px);
-        }
+        .modal-save-btn:hover { background-color: var(--success-hover); transform: translateY(-2px); }
     </style>
 </head>
 <body>
-
+    <h1>Kanban N2 (Hermes)</h1>
     <div class="kanban-board">
-        <div class="kanban-column" id="column-todo">
+        <div class="kanban-column">
             <h2>Atividade</h2>
             <div class="cards-container" data-column-id="todo-cards"></div>
             <form class="add-card-form">
@@ -375,8 +242,7 @@
                 <button type="submit" class="add-card-btn">+</button>
             </form>
         </div>
-
-        <div class="kanban-column" id="column-inprogress">
+        <div class="kanban-column">
             <h2>Em andamento</h2>
             <div class="cards-container" data-column-id="inprogress-cards"></div>
             <form class="add-card-form">
@@ -384,8 +250,7 @@
                 <button type="submit" class="add-card-btn">+</button>
             </form>
         </div>
-
-        <div class="kanban-column" id="column-pending">
+        <div class="kanban-column">
             <h2>Pendente</h2>
             <div class="cards-container" data-column-id="pending-cards"></div>
             <form class="add-card-form">
@@ -393,8 +258,7 @@
                 <button type="submit" class="add-card-btn">+</button>
             </form>
         </div>
-
-        <div class="kanban-column" id="column-done">
+        <div class="kanban-column">
             <h2>Concluído</h2>
             <div class="cards-container" data-column-id="done-cards"></div>
             <form class="add-card-form">
@@ -410,112 +274,156 @@
             <h3 id="modal-title"></h3>
             <p><strong>Descrição</strong></p>
             <textarea id="modal-description" placeholder="Adicione uma descrição mais detalhada..."></textarea>
-            
             <div class="modal-labels-container">
                 <h4>Etiquetas (Tags)</h4>
                 <div class="modal-labels" id="modal-labels"></div>
             </div>
-            
             <button class="modal-save-btn" id="modal-save-btn">Salvar Alterações</button>
         </div>
     </div>
 
     <script>
+        const SUPABASE_URL = 'https://jlyigpmltxyicpyhaytl.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpseWlncG1sdHh5aWNweWhheXRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzNTQ1ODcsImV4cCI6MjA2OTkzMDU4N30.j9-0_5sp-wyfZzc1XppDoi6Nz5NoH3u64Sv47w3BKe0';
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
         document.addEventListener('DOMContentLoaded', () => {
-            // Adiciona o H1 ao corpo do documento para que não seja afetado pelo wrapper
-            const h1 = document.createElement('h1');
-            h1.textContent = 'NuCel - Kanban N2';
-            document.body.insertBefore(h1, document.querySelector('.kanban-board'));
-
-
             const forms = document.querySelectorAll('.add-card-form');
             const cardContainers = document.querySelectorAll('.cards-container');
             let draggedCard = null;
             let currentEditingCard = null;
 
             const LABEL_COLORS = {
-                green: '#61bd4f',
-                yellow: '#f2d600',
-                orange: '#ff9f1a',
-                red: '#eb5a46',
-                purple: '#c377e0',
-                blue: '#0079bf'
+                green: '#61bd4f', yellow: '#f2d600', orange: '#ff9f1a',
+                red: '#eb5a46', purple: '#c377e0', blue: '#0079bf'
             };
+            
+            // --- FUNÇÕES DE LÓGICA DO SUPABASE ---
 
-            const createCardElement = (cardData) => {
+            async function loadCardsFromDB() {
+                const { data: cards, error } = await sb.from('cards').select('*').order('created_at', { ascending: true });
+                if (error) {
+                    console.error('ERRO AO CARREGAR CARDS:', error);
+                    alert("Não foi possível carregar os cards. Verifique o console (F12) para mais detalhes.");
+                    return;
+                }
+                cardContainers.forEach(c => c.innerHTML = '');
+                cards.forEach(cardData => {
+                    const container = document.querySelector(`.cards-container[data-column-id="${cardData.column_id}"]`);
+                    if (container) {
+                        const cardElement = createCardElement(cardData);
+                        container.appendChild(cardElement);
+                    }
+                });
+            }
+
+            async function addCardToDB(text, columnId) {
+                const { data, error } = await sb.from('cards').insert([{ text, column_id: columnId }]).select();
+                if (error) {
+                    console.error('ERRO AO ADICIONAR CARD:', error);
+                    alert("Falha ao adicionar o card. Verifique o console (F12) e as configurações do Supabase (RLS, Nomes de Coluna).");
+                    return null;
+                }
+                return data[0];
+            }
+            
+            async function deleteCardFromDB(cardId) {
+                const { error } = await sb.from('cards').delete().eq('id', cardId);
+                if (error) console.error('ERRO AO DELETAR CARD:', error);
+            }
+            
+            async function updateCardInDB(cardId, updates) {
+                const { error } = await sb.from('cards').update(updates).eq('id', cardId);
+                if (error) console.error('ERRO AO ATUALIZAR CARD:', error);
+            }
+
+            // --- FUNÇÕES DE MANIPULAÇÃO DO DOM (INTERFACE) ---
+
+            function createCardElement(cardData) {
                 const card = document.createElement('div');
-                card.classList.add('card');
+                card.className = 'card';
                 card.draggable = true;
                 card.dataset.id = cardData.id;
                 card.dataset.description = cardData.description || '';
                 card.dataset.labels = JSON.stringify(cardData.labels || []);
-
+                card.dataset.columnId = cardData.column_id;
+                
                 const labelsContainer = document.createElement('div');
-                labelsContainer.classList.add('card-labels');
+                labelsContainer.className = 'card-labels';
                 
                 const cardText = document.createElement('div');
-                cardText.classList.add('card-text');
+                cardText.className = 'card-text';
                 cardText.textContent = cardData.text;
                 
                 const deleteBtn = document.createElement('span');
-                deleteBtn.classList.add('delete-card');
+                deleteBtn.className = 'delete-card';
                 deleteBtn.innerHTML = '&times;';
 
-                card.appendChild(labelsContainer);
-                card.appendChild(cardText);
-                card.appendChild(deleteBtn);
-
+                card.append(labelsContainer, cardText, deleteBtn);
                 updateCardLabels(card);
                 addEventListenersToCard(card);
-                
                 return card;
-            };
-
-            const addEventListenersToCard = (card) => {
+            }
+            
+            function addEventListenersToCard(card) {
                 card.addEventListener('dragstart', () => {
                     draggedCard = card;
                     setTimeout(() => card.classList.add('dragging'), 0);
                 });
-                card.addEventListener('dragend', () => {
-                    if (draggedCard) {
-                        draggedCard.classList.remove('dragging');
+
+                card.addEventListener('dragend', async () => {
+                    if (!draggedCard) return;
+                    draggedCard.classList.remove('dragging');
+                    const newColumnId = draggedCard.parentElement.dataset.columnId;
+                    const cardId = draggedCard.dataset.id;
+                    
+                    if (draggedCard.dataset.columnId !== newColumnId) {
+                        draggedCard.dataset.columnId = newColumnId;
+                        await updateCardInDB(cardId, { column_id: newColumnId });
                     }
                     draggedCard = null;
-                    saveState();
                 });
 
-                card.querySelector('.card-text').addEventListener('click', () => {
-                    openModal(card);
-                });
+                card.querySelector('.card-text').addEventListener('click', () => openModal(card));
 
-                card.querySelector('.delete-card').addEventListener('click', (e) => {
+                card.querySelector('.delete-card').addEventListener('click', async (e) => {
                     e.stopPropagation();
                     if (confirm('Tem certeza que deseja deletar este card?')) {
+                        const cardId = card.dataset.id;
+                        await deleteCardFromDB(cardId);
                         card.remove();
-                        saveState();
                     }
                 });
-            };
-            
-            const updateCardLabels = (card) => {
-                const labelsContainer = card.querySelector('.card-labels');
-                const labels = JSON.parse(card.dataset.labels || '[]');
-                labelsContainer.innerHTML = '';
-                labels.forEach(color => {
-                    const labelDiv = document.createElement('div');
-                    labelDiv.classList.add('card-label');
-                    labelDiv.style.backgroundColor = color;
-                    labelsContainer.appendChild(labelDiv);
-                });
             }
+            
+            // --- EVENTOS PRINCIPAIS ---
 
+            forms.forEach(form => {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const input = form.querySelector('.add-card-input');
+                    const text = input.value.trim();
+                    const container = form.previousElementSibling;
+                    const columnId = container.dataset.columnId;
+
+                    if (text && columnId) {
+                        const newCardData = await addCardToDB(text, columnId);
+                        if (newCardData) {
+                            const cardElement = createCardElement(newCardData);
+                            container.appendChild(cardElement);
+                        }
+                        input.value = '';
+                    }
+                });
+            });
+            
             cardContainers.forEach(container => {
                 container.addEventListener('dragover', (e) => {
                     e.preventDefault();
                     const afterElement = getDragAfterElement(container, e.clientY);
                     const currentDraggingCard = document.querySelector('.dragging');
-                    if (currentDraggingCard) {
-                         if (afterElement == null) {
+                    if(currentDraggingCard){
+                        if (afterElement == null) {
                             container.appendChild(currentDraggingCard);
                         } else {
                             container.insertBefore(currentDraggingCard, afterElement);
@@ -524,7 +432,75 @@
                 });
             });
 
-            const getDragAfterElement = (container, y) => {
+            // --- LÓGICA DO MODAL (COMPLETA) ---
+            const modal = document.getElementById('card-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalDescription = document.getElementById('modal-description');
+            const modalLabels = document.getElementById('modal-labels');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
+            const modalSaveBtn = document.getElementById('modal-save-btn');
+
+            function openModal(card) {
+                currentEditingCard = card;
+                modalTitle.textContent = card.querySelector('.card-text').textContent;
+                modalDescription.value = card.dataset.description || '';
+                
+                modalLabels.innerHTML = '';
+                const currentLabels = JSON.parse(card.dataset.labels || '[]');
+                Object.values(LABEL_COLORS).forEach(color => {
+                    const labelDiv = document.createElement('div');
+                    labelDiv.className = 'modal-label';
+                    labelDiv.style.backgroundColor = color;
+                    labelDiv.dataset.color = color;
+                    if (currentLabels.includes(color)) {
+                        labelDiv.classList.add('selected');
+                    }
+                    labelDiv.addEventListener('click', () => labelDiv.classList.toggle('selected'));
+                    modalLabels.appendChild(labelDiv);
+                });
+                modal.classList.add('visible');
+            }
+
+            function closeModal() {
+                modal.classList.remove('visible');
+            }
+            
+            modalSaveBtn.addEventListener('click', async () => {
+                if (!currentEditingCard) return;
+
+                const cardId = currentEditingCard.dataset.id;
+                const newDescription = modalDescription.value;
+                const selectedLabels = Array.from(modalLabels.querySelectorAll('.modal-label.selected'))
+                                            .map(el => el.dataset.color);
+                
+                const updates = { description: newDescription, labels: selectedLabels };
+                await updateCardInDB(cardId, updates);
+                
+                currentEditingCard.dataset.description = newDescription;
+                currentEditingCard.dataset.labels = JSON.stringify(selectedLabels);
+                updateCardLabels(currentEditingCard);
+                closeModal();
+            });
+
+            modalCloseBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+
+            // --- FUNÇÕES HELPER (COMPLETAS) ---
+            function updateCardLabels(card) {
+                const labelsContainer = card.querySelector('.card-labels');
+                const labels = JSON.parse(card.dataset.labels || '[]');
+                labelsContainer.innerHTML = '';
+                labels.forEach(color => {
+                    const labelDiv = document.createElement('div');
+                    labelDiv.className = 'card-label';
+                    labelDiv.style.backgroundColor = color;
+                    labelsContainer.appendChild(labelDiv);
+                });
+            }
+
+            function getDragAfterElement(container, y) {
                 const draggableElements = [...container.querySelectorAll('.card:not(.dragging)')];
                 return draggableElements.reduce((closest, child) => {
                     const box = child.getBoundingClientRect();
@@ -535,121 +511,10 @@
                         return closest;
                     }
                 }, { offset: Number.NEGATIVE_INFINITY }).element;
-            };
+            }
 
-            forms.forEach(form => {
-                form.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    const input = form.querySelector('.add-card-input');
-                    const text = input.value.trim();
-                    if (text) {
-                        const cardData = {
-                            id: 'card-' + Date.now(),
-                            text: text,
-                            description: '',
-                            labels: []
-                        };
-                        const cardElement = createCardElement(cardData);
-                        const container = form.previousElementSibling;
-                        container.appendChild(cardElement);
-                        input.value = '';
-                        saveState();
-                    }
-                });
-            });
-            
-            const modal = document.getElementById('card-modal');
-            const modalTitle = document.getElementById('modal-title');
-            const modalDescription = document.getElementById('modal-description');
-            const modalLabels = document.getElementById('modal-labels');
-            const modalCloseBtn = document.getElementById('modal-close-btn');
-            const modalSaveBtn = document.getElementById('modal-save-btn');
-
-            const openModal = (card) => {
-                currentEditingCard = card;
-                modalTitle.textContent = card.querySelector('.card-text').textContent;
-                modalDescription.value = card.dataset.description || '';
-                
-                modalLabels.innerHTML = '';
-                const currentLabels = JSON.parse(card.dataset.labels || '[]');
-                Object.values(LABEL_COLORS).forEach(color => {
-                    const labelDiv = document.createElement('div');
-                    labelDiv.classList.add('modal-label');
-                    labelDiv.style.backgroundColor = color;
-                    labelDiv.dataset.color = color;
-                    if (currentLabels.includes(color)) {
-                        labelDiv.classList.add('selected');
-                    }
-                    labelDiv.addEventListener('click', () => {
-                        labelDiv.classList.toggle('selected');
-                    });
-                    modalLabels.appendChild(labelDiv);
-                });
-
-                modal.classList.add('visible');
-            };
-
-            const closeModal = () => {
-                modal.classList.remove('visible');
-            };
-            
-            modalSaveBtn.addEventListener('click', () => {
-                if (currentEditingCard) {
-                    currentEditingCard.dataset.description = modalDescription.value;
-                    
-                    const selectedLabels = [];
-                    modalLabels.querySelectorAll('.modal-label.selected').forEach(labelEl => {
-                        selectedLabels.push(labelEl.dataset.color);
-                    });
-                    currentEditingCard.dataset.labels = JSON.stringify(selectedLabels);
-
-                    updateCardLabels(currentEditingCard);
-                    saveState();
-                    closeModal();
-                }
-            });
-
-            modalCloseBtn.addEventListener('click', closeModal);
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    closeModal();
-                }
-            });
-
-            const saveState = () => {
-                const state = {};
-                cardContainers.forEach(container => {
-                    const columnId = container.dataset.columnId;
-                    const cardsData = [...container.querySelectorAll('.card')].map(card => {
-                        return {
-                            id: card.dataset.id,
-                            text: card.querySelector('.card-text').textContent,
-                            description: card.dataset.description,
-                            labels: JSON.parse(card.dataset.labels)
-                        };
-                    });
-                    state[columnId] = cardsData;
-                });
-                localStorage.setItem('kanbanState-modern', JSON.stringify(state));
-            };
-
-            const loadState = () => {
-                const state = JSON.parse(localStorage.getItem('kanbanState-modern'));
-                if (!state) return;
-
-                Object.keys(state).forEach(columnId => {
-                    const container = document.querySelector(`.cards-container[data-column-id="${columnId}"]`);
-                    if (container) {
-                        container.innerHTML = '';
-                        state[columnId].forEach(cardData => {
-                            const cardElement = createCardElement(cardData);
-                            container.appendChild(cardElement);
-                        });
-                    }
-                });
-            };
-
-            loadState();
+            // --- INICIALIZAÇÃO DA APLICAÇÃO ---
+            loadCardsFromDB();
         });
     </script>
 </body>
