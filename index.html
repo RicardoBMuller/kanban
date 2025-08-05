@@ -101,24 +101,12 @@
         .delete-card { position: absolute; top: 10px; right: 10px; cursor: pointer; color: var(--text-secondary); font-size: 1.2rem; opacity: 0; transition: opacity 0.3s ease, color 0.3s ease; }
         .card:hover .delete-card { opacity: 1; }
         .delete-card:hover { color: var(--delete-color); }
-
-        /* --- CORREÇÃO: Estilos para o formulário "Nova Atividade" --- */
-        .add-card-form { display: flex; margin-top: auto; /* Empurra para o final da coluna */ }
-        .add-card-input {
-            width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color);
-            border-radius: 8px 0 0 8px; padding: 10px 15px; font-size: 0.9rem;
-            color: var(--text-primary); outline: none; transition: background-color 0.3s ease;
-        }
+        .add-card-form { display: flex; margin-top: auto; }
+        .add-card-input { width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 8px 0 0 8px; padding: 10px 15px; font-size: 0.9rem; color: var(--text-primary); outline: none; transition: background-color 0.3s ease; }
         .add-card-input::placeholder { color: var(--text-secondary); }
         .add-card-input:focus { background: rgba(0,0,0,0.4); }
-        .add-card-btn {
-            background-color: var(--accent-color); color: white; border: none;
-            border-radius: 0 8px 8px 0; padding: 0 18px; cursor: pointer;
-            font-size: 1.5rem; transition: background-color 0.3s ease;
-        }
+        .add-card-btn { background-color: var(--accent-color); color: white; border: none; border-radius: 0 8px 8px 0; padding: 0 18px; cursor: pointer; font-size: 1.5rem; transition: background-color 0.3s ease; }
         .add-card-btn:hover { background-color: var(--accent-hover); }
-
-        /* --- Estilos do Modal --- */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 1000; opacity: 0; transition: opacity 0.3s ease; }
         .modal-overlay.visible { display: flex; opacity: 1; }
         .modal-content { background: var(--column-bg); border: 1px solid var(--border-color); backdrop-filter: blur(15px); padding: 30px; border-radius: var(--border-radius); width: 90%; max-width: 650px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); position: relative; transform: scale(0.95); transition: transform 0.3s ease; }
@@ -154,6 +142,7 @@
                 <div class="input-group"><label for="signup-name">Nome Completo</label><input type="text" id="signup-name" required></div>
                 <div class="input-group"><label for="signup-email">Email</label><input type="email" id="signup-email" required></div>
                 <div class="input-group"><label for="signup-password">Crie uma Senha (mín. 6 caracteres)</label><input type="password" id="signup-password" required minlength="6"></div>
+                <div class="input-group"><label for="signup-password-confirm">Confirmar Senha</label><input type="password" id="signup-password-confirm" required minlength="6"></div>
                 <button type="submit">Criar Conta</button>
             </form>
             <div id="message-area" class="message" style="display: none;"></div>
@@ -211,13 +200,27 @@
 
         formSignup.addEventListener('submit', async (e) => {
             e.preventDefault();
-            showMessage('Criando conta...', 'success');
             const name = document.getElementById('signup-name').value;
             const email = document.getElementById('signup-email').value;
             const password = document.getElementById('signup-password').value;
+            const passwordConfirm = document.getElementById('signup-password-confirm').value;
+
+            // --- VALIDAÇÃO DAS SENHAS ---
+            if (password.length < 6) {
+                showMessage('A senha deve ter no mínimo 6 caracteres.');
+                return; // Para a execução
+            }
+            if (password !== passwordConfirm) {
+                showMessage('As senhas não coincidem. Por favor, tente novamente.');
+                return; // Para a execução
+            }
+            // --- FIM DA VALIDAÇÃO ---
+
+            showMessage('Criando conta...', 'success');
             const { data, error } = await sb.auth.signUp({
                 email, password, options: { data: { full_name: name } }
             });
+
             if (error) {
                 showMessage(`Erro: ${error.message}`);
             } else {
@@ -492,6 +495,7 @@
             loadCardsFromDB();
         }
 
+        // --- PONTO DE ENTRADA INICIAL DA APLICAÇÃO ---
         checkAuthState();
     </script>
 </body>
