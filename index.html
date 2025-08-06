@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kanban N2 (Hermes)</title>
+    <title>Kanban N2 (Hermes) - Login e Recuperação</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -68,6 +68,7 @@
         .message { margin-top: 15px; text-align: center; padding: 10px; border-radius: 5px; font-weight: 500; }
         .message.error { background-color: var(--error-color); }
         .message.success { background-color: var(--success-color); }
+        .forgot-password-link { font-size: 0.8rem; color: var(--text-secondary); text-align: center; margin-top: 15px; cursor: pointer; text-decoration: underline; }
 
         /* --- Estilos do App Kanban --- */
         #kanban-app { width: 100%; }
@@ -128,23 +129,41 @@
 
     <div id="auth-container">
         <div class="login-container">
-            <h1>Kanban N2 (Hermes)</h1>
+            <h1 id="auth-title">Kanban N2 (Hermes)</h1>
             <div class="tabs">
                 <div class="tab active" data-form="signin">Entrar</div>
                 <div class="tab" data-form="signup">Criar Conta</div>
             </div>
+            
             <form id="form-signin" class="active">
-                <div class="input-group"><label for="signin-email">Email</label><input type="email" id="signin-email" required></div>
-                <div class="input-group"><label for="signin-password">Senha</label><input type="password" id="signin-password" required></div>
+                <div class="input-group"><label for="signin-email">Email</label><input type="email" id="signin-email" autocomplete="email" required></div>
+                <div class="input-group"><label for="signin-password">Senha</label><input type="password" id="signin-password" autocomplete="current-password" required></div>
                 <button type="submit">Entrar</button>
+                <a class="forgot-password-link" id="forgot-password-link">Esqueci minha senha</a>
             </form>
+            
             <form id="form-signup">
-                <div class="input-group"><label for="signup-name">Nome Completo</label><input type="text" id="signup-name" required></div>
-                <div class="input-group"><label for="signup-email">Email</label><input type="email" id="signup-email" required></div>
-                <div class="input-group"><label for="signup-password">Crie uma Senha (mín. 6 caracteres)</label><input type="password" id="signup-password" required minlength="6"></div>
-                <div class="input-group"><label for="signup-password-confirm">Confirmar Senha</label><input type="password" id="signup-password-confirm" required minlength="6"></div>
+                <div class="input-group"><label for="signup-name">Nome Completo</label><input type="text" id="signup-name" autocomplete="name" required></div>
+                <div class="input-group"><label for="signup-email">Email</label><input type="email" id="signup-email" autocomplete="email" required></div>
+                <div class="input-group"><label for="signup-password">Crie uma Senha</label><input type="password" id="signup-password" autocomplete="new-password" required minlength="6"></div>
+                <div class="input-group"><label for="signup-password-confirm">Confirmar Senha</label><input type="password" id="signup-password-confirm" autocomplete="new-password" required minlength="6"></div>
                 <button type="submit">Criar Conta</button>
             </form>
+
+            <form id="form-reset-password">
+                <p>Digite seu e-mail para receber o link de redefinição de senha.</p>
+                <div class="input-group"><label for="reset-email">Email</label><input type="email" id="reset-email" autocomplete="email" required></div>
+                <button type="submit">Enviar Link</button>
+                <a class="forgot-password-link" id="back-to-login-link">Voltar para o Login</a>
+            </form>
+
+            <form id="form-update-password">
+                <p>Crie sua nova senha. Ela deve ter no mínimo 6 caracteres.</p>
+                <div class="input-group"><label for="update-password">Nova Senha</label><input type="password" id="update-password" autocomplete="new-password" required minlength="6"></div>
+                <div class="input-group"><label for="update-password-confirm">Confirmar Nova Senha</label><input type="password" id="update-password-confirm" autocomplete="new-password" required minlength="6"></div>
+                <button type="submit">Atualizar Senha</button>
+            </form>
+
             <div id="message-area" class="message" style="display: none;"></div>
         </div>
     </div>
@@ -174,28 +193,44 @@
 
         const authContainer = document.getElementById('auth-container');
         const kanbanApp = document.getElementById('kanban-app');
-        const logoutButton = document.getElementById('logout-button');
         const formSignin = document.getElementById('form-signin');
         const formSignup = document.getElementById('form-signup');
-        const tabs = document.querySelectorAll('.tab');
+        const formResetPassword = document.getElementById('form-reset-password');
+        const formUpdatePassword = document.getElementById('form-update-password');
+        const forgotPasswordLink = document.getElementById('forgot-password-link');
+        const backToLoginLink = document.getElementById('back-to-login-link');
+        const tabsContainer = document.querySelector('.tabs');
+        const authTitle = document.getElementById('auth-title');
         const messageArea = document.getElementById('message-area');
         
         let currentUser = null;
         let isKanbanInitialized = false;
 
-        tabs.forEach(tab => {
+        function showAuthForm(formToShow) {
+            [formSignin, formSignup, formResetPassword, formUpdatePassword].forEach(form => form.classList.remove('active'));
+            formToShow.classList.add('active');
+            const isUpdateForm = formToShow === formUpdatePassword;
+            tabsContainer.style.display = isUpdateForm ? 'none' : 'flex';
+            backToLoginLink.style.display = formToShow === formResetPassword ? 'block' : 'none';
+            authTitle.textContent = isUpdateForm ? 'Crie sua Nova Senha' : 'Kanban N2 (Hermes)';
+        }
+
+        document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
-                tabs.forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
-                formSignin.classList.toggle('active', tab.dataset.form === 'signin');
-                formSignup.classList.toggle('active', tab.dataset.form === 'signup');
+                showAuthForm(document.getElementById(`form-${tab.dataset.form}`));
             });
         });
+        
+        forgotPasswordLink.addEventListener('click', () => showAuthForm(formResetPassword));
+        backToLoginLink.addEventListener('click', () => showAuthForm(formSignin));
 
-        function showMessage(message, type = 'error') {
+        function showMessage(message, type = 'success', duration = 3000) {
             messageArea.textContent = message;
             messageArea.className = `message ${type}`;
             messageArea.style.display = 'block';
+            setTimeout(() => { messageArea.style.display = 'none'; }, duration);
         }
 
         formSignup.addEventListener('submit', async (e) => {
@@ -205,27 +240,17 @@
             const password = document.getElementById('signup-password').value;
             const passwordConfirm = document.getElementById('signup-password-confirm').value;
 
-            // --- VALIDAÇÃO DAS SENHAS ---
-            if (password.length < 6) {
-                showMessage('A senha deve ter no mínimo 6 caracteres.');
-                return; // Para a execução
-            }
-            if (password !== passwordConfirm) {
-                showMessage('As senhas não coincidem. Por favor, tente novamente.');
-                return; // Para a execução
-            }
-            // --- FIM DA VALIDAÇÃO ---
+            if (password.length < 6) { return showMessage('A senha deve ter no mínimo 6 caracteres.', 'error'); }
+            if (password !== passwordConfirm) { return showMessage('As senhas não coincidem.', 'error'); }
 
             showMessage('Criando conta...', 'success');
             const { data, error } = await sb.auth.signUp({
                 email, password, options: { data: { full_name: name } }
             });
-
-            if (error) {
-                showMessage(`Erro: ${error.message}`);
-            } else {
+            if (error) { showMessage(`Erro: ${error.message}`, 'error'); } 
+            else {
                 showMessage('Conta criada! Faça o login para continuar.', 'success');
-                tabs[0].click(); 
+                document.querySelectorAll('.tab')[0].click(); 
                 formSignin.querySelector('#signin-email').value = email;
             }
         });
@@ -234,47 +259,64 @@
             e.preventDefault();
             const email = document.getElementById('signin-email').value;
             const password = document.getElementById('signin-password').value;
-            const { data, error } = await sb.auth.signInWithPassword({ email, password });
-            if (error) {
-                showMessage(`Erro: ${error.message}`);
-            } else if (data.session) {
-                checkAuthState(); 
-            }
-        });
-        
-        logoutButton.addEventListener('click', async () => {
-            await sb.auth.signOut();
-            isKanbanInitialized = false; 
-            checkAuthState(); 
+            const { error } = await sb.auth.signInWithPassword({ email, password });
+            if (error) showMessage(`Erro: ${error.message}`, 'error');
         });
 
-        async function checkAuthState() {
-            const { data: { session } } = await sb.auth.getSession();
-            currentUser = session?.user || null;
-            if (currentUser) {
-                authContainer.classList.add('hidden');
-                kanbanApp.classList.remove('hidden');
-                if (!isKanbanInitialized) {
-                    initializeKanban(); 
-                    isKanbanInitialized = true;
-                }
-            } else {
-                authContainer.classList.remove('hidden');
-                kanbanApp.classList.add('hidden');
+        formResetPassword.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('reset-email').value;
+            showMessage('Verificando...', 'success');
+            const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.href });
+            if (error) { showMessage(`Erro: ${error.message}`, 'error'); }
+            else { showMessage('Se uma conta com este e-mail existir, um link foi enviado.', 'success', 5000); }
+        });
+
+        formUpdatePassword.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const password = document.getElementById('update-password').value;
+            const passwordConfirm = document.getElementById('update-password-confirm').value;
+            if (password.length < 6) { return showMessage('A nova senha deve ter no mínimo 6 caracteres.', 'error'); }
+            if (password !== passwordConfirm) { return showMessage('As senhas não coincidem.', 'error'); }
+            const { error } = await sb.auth.updateUser({ password });
+            if (error) { showMessage(`Erro: ${error.message}`, 'error'); }
+            else {
+                showMessage('Senha atualizada com sucesso! Você será redirecionado.', 'success');
+                setTimeout(() => { window.location.hash = ''; showAuthForm(formSignin); }, 2000);
             }
-        }
+        });
+
+        sb.auth.onAuthStateChange((event, session) => {
+            if (event === 'PASSWORD_RECOVERY') {
+                showAuthForm(formUpdatePassword);
+            } else {
+                currentUser = session?.user || null;
+                if (currentUser) {
+                    authContainer.classList.add('hidden');
+                    kanbanApp.classList.remove('hidden');
+                    if (!isKanbanInitialized) {
+                        initializeKanban(); 
+                        isKanbanInitialized = true;
+                    }
+                } else {
+                    authContainer.classList.remove('hidden');
+                    kanbanApp.classList.add('hidden');
+                    isKanbanInitialized = false;
+                    showAuthForm(formSignin);
+                }
+            }
+        });
         
+        document.getElementById('logout-button').addEventListener('click', async () => {
+            await sb.auth.signOut();
+        });
+
         function initializeKanban() {
             const kanbanBoard = kanbanApp.querySelector('.kanban-board');
             if(kanbanBoard.children.length === 0) {
                 const columnNames = { "todo-cards": "Atividade", "inprogress-cards": "Em andamento", "pending-cards": "Pendente", "done-cards": "Concluído" };
                 for (const [id, title] of Object.entries(columnNames)) {
-                    kanbanBoard.innerHTML += `
-                        <div class="kanban-column">
-                            <h2>${title}</h2>
-                            <div class="cards-container" data-column-id="${id}"></div>
-                            <form class="add-card-form"><input type="text" class="add-card-input" placeholder="Nova atividade..."><button type="submit" class="add-card-btn">+</button></form>
-                        </div>`;
+                    kanbanBoard.innerHTML += `<div class="kanban-column"><h2>${title}</h2><div class="cards-container" data-column-id="${id}"></div><form class="add-card-form"><input type="text" class="add-card-input" placeholder="Nova atividade..."><button type="submit" class="add-card-btn">+</button></form></div>`;
                 }
             }
             
@@ -289,15 +331,15 @@
             };
             const AVATAR_COLORS = ['#e53935','#d81b60','#8e24aa','#5e35b1','#3949ab','#1e88e5','#039be5','#00acc1','#00897b','#43a047','#7cb342','#c0ca33','#fdd835','#ffb300','#fb8c00','#f4511e','#6d4c41','#757575','#546e7a'];
             
-            document.querySelectorAll('.add-card-form').forEach(f => f.addEventListener('submit', onAddCardSubmit));
-            document.querySelectorAll('.cards-container').forEach(c => c.addEventListener('dragover', onDragOver));
+            kanbanApp.querySelectorAll('.add-card-form').forEach(f => f.addEventListener('submit', onAddCardSubmit));
+            kanbanApp.querySelectorAll('.cards-container').forEach(c => c.addEventListener('dragover', onDragOver));
 
             async function loadCardsFromDB() {
                 const { data: cards, error } = await sb.from('cards').select('*').order('created_at', { ascending: true });
                 if (error) { console.error('ERRO AO CARREGAR CARDS:', error); return; }
-                document.querySelectorAll('.cards-container').forEach(c => c.innerHTML = '');
+                kanbanApp.querySelectorAll('.cards-container').forEach(c => c.innerHTML = '');
                 cards.forEach(cardData => {
-                    const container = document.querySelector(`.cards-container[data-column-id="${cardData.column_id}"]`);
+                    const container = kanbanApp.querySelector(`.cards-container[data-column-id="${cardData.column_id}"]`);
                     if (container) container.appendChild(createCardElement(cardData));
                 });
             }
@@ -332,7 +374,7 @@
                 addEventListenersToCard(card);
                 return card;
             }
-
+            
             function updateCardUI(card) {
                 updateCardLabels(card);
                 updateCardDescriptionSnippet(card);
@@ -494,9 +536,6 @@
             
             loadCardsFromDB();
         }
-
-        // --- PONTO DE ENTRADA INICIAL DA APLICAÇÃO ---
-        checkAuthState();
     </script>
 </body>
 </html>
