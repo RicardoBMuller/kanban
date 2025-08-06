@@ -43,7 +43,7 @@
         button {
             background-color: var(--accent-color); color: white; border: none; padding: 12px;
             border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px;
-            font-size: 1rem; transition: background-color 0.3s ease;
+            font-size: 1rem; transition: background-color: 0.3s ease;
         }
         button:hover { background-color: var(--accent-hover); }
         .message { margin-top: 15px; text-align: center; padding: 10px; border-radius: 5px; font-weight: 500; display: none; }
@@ -71,8 +71,8 @@
     </div>
 
     <script>
-        const SUPABASE_URL = 'https://jlyigpmltxyicpyhaytl.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_mIaLTnBFCZNu8OZ5J-N7Sg_Pj6W6zW2';
+        const SUPABASE_URL = 'COLE_SUA_URL_AQUI';
+        const SUPABASE_KEY = 'COLE_SUA_CHAVE_ANON_AQUI';
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         const formUpdatePassword = document.getElementById('form-update-password');
@@ -82,32 +82,38 @@
             messageArea.textContent = message;
             messageArea.className = `message ${type}`;
             messageArea.style.display = 'block';
-            setTimeout(() => { messageArea.style.display = 'none'; }, duration);
+            if (type === 'success') {
+                setTimeout(() => { messageArea.style.display = 'none'; }, duration);
+            }
         }
 
         // Este listener é ativado assim que a página carrega e o Supabase detecta
-        // o token de recuperação na URL.
+        // o token de recuperação na URL, criando uma sessão temporária.
         sb.auth.onAuthStateChange(async (event, session) => {
-            if (event === "PASSWORD_RECOVERY") {
-                formUpdatePassword.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const password = document.getElementById('update-password').value;
-                    const passwordConfirm = document.getElementById('update-password-confirm').value;
+            if (event === "SIGNED_IN") {
+                // A sessão foi estabelecida pelo token, agora podemos atualizar o usuário
+                console.log("Sessão de recuperação estabelecida. Pronto para atualizar a senha.");
+            }
+        });
 
-                    if (password.length < 6) { return showMessage('A nova senha deve ter no mínimo 6 caracteres.', 'error'); }
-                    if (password !== passwordConfirm) { return showMessage('As senhas não coincidem.', 'error'); }
+        formUpdatePassword.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const password = document.getElementById('update-password').value;
+            const passwordConfirm = document.getElementById('update-password-confirm').value;
 
-                    const { error } = await sb.auth.updateUser({ password });
-                    
-                    if (error) {
-                        showMessage(`Erro ao atualizar senha: ${error.message}`, 'error');
-                    } else {
-                        showMessage('Senha atualizada com sucesso! Redirecionando para o login...', 'success');
-                        setTimeout(() => {
-                            window.location.href = 'kanban.html'; // Redireciona para a página principal
-                        }, 2000);
-                    }
-                });
+            if (password.length < 6) { return showMessage('A nova senha deve ter no mínimo 6 caracteres.', 'error'); }
+            if (password !== passwordConfirm) { return showMessage('As senhas não coincidem.', 'error'); }
+
+            const { error } = await sb.auth.updateUser({ password });
+            
+            if (error) {
+                showMessage(`Erro ao atualizar senha: ${error.message}`, 'error');
+            } else {
+                showMessage('Senha atualizada com sucesso! Redirecionando para o login...', 'success');
+                setTimeout(() => {
+                    // Redireciona para a página principal para fazer login com a nova senha
+                    window.location.href = 'kanban.html'; 
+                }, 2500);
             }
         });
     </script>
