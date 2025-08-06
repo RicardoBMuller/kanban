@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redefinir Senha - Kanban N2</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root {
+            --font-family: 'Poppins', sans-serif; --card-bg: #2a2d4d; --text-primary: #f0f0f0;
+            --text-secondary: #b0b8d1; --accent-color: #4a90e2; --accent-hover: #5aa1f2;
+            --success-color: #5aac44; --error-color: #e53935;
+        }
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; height: 100vh; width: 100vw; z-index: -1;
+            background-image: url('https://i.imgur.com/55lGGhS.jpg'); background-size: cover; background-position: center; filter: blur(4px);
+        }
+        body {
+            font-family: var(--font-family); background-color: rgba(13, 17, 46, 0.7);
+            color: var(--text-primary); margin: 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 100vh; padding: 25px; box-sizing: border-box;
+        }
+        .login-container {
+            background: rgba(22, 22, 38, 0.6); border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px); padding: 40px; border-radius: 12px;
+            width: 90%; max-width: 400px; box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+        }
+        h1 { font-weight: 700; text-align: center; margin-top: 0; }
+        form { display: flex; flex-direction: column; gap: 15px; }
+        .input-group { display: flex; flex-direction: column; }
+        .input-group label { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 5px; }
+        input {
+            background: rgba(0,0,0,0.2); border: 1px solid var(--text-secondary);
+            border-radius: 8px; padding: 12px; font-size: 1rem; color: var(--text-primary);
+        }
+        button {
+            background-color: var(--accent-color); color: white; border: none; padding: 12px;
+            border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px;
+            font-size: 1rem; transition: background-color 0.3s ease;
+        }
+        button:hover { background-color: var(--accent-hover); }
+        .message { margin-top: 15px; text-align: center; padding: 10px; border-radius: 5px; font-weight: 500; display: none; }
+        .message.error { background-color: var(--error-color); }
+        .message.success { background-color: var(--success-color); }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h1>Crie sua Nova Senha</h1>
+        <form id="form-update-password">
+            <p>Por favor, crie uma nova senha. Ela deve ter no mínimo 6 caracteres.</p>
+            <div class="input-group">
+                <label for="update-password">Nova Senha</label>
+                <input type="password" id="update-password" autocomplete="new-password" required minlength="6">
+            </div>
+            <div class="input-group">
+                <label for="update-password-confirm">Confirmar Nova Senha</label>
+                <input type="password" id="update-password-confirm" autocomplete="new-password" required minlength="6">
+            </div>
+            <button type="submit">Atualizar Senha</button>
+        </form>
+        <div id="message-area" class="message"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://jlyigpmltxyicpyhaytl.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_mIaLTnBFCZNu8OZ5J-N7Sg_Pj6W6zW2';
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const formUpdatePassword = document.getElementById('form-update-password');
+        const messageArea = document.getElementById('message-area');
+
+        function showMessage(message, type = 'success', duration = 4000) {
+            messageArea.textContent = message;
+            messageArea.className = `message ${type}`;
+            messageArea.style.display = 'block';
+            setTimeout(() => { messageArea.style.display = 'none'; }, duration);
+        }
+
+        // Este listener é ativado assim que a página carrega e o Supabase detecta
+        // o token de recuperação na URL.
+        sb.auth.onAuthStateChange(async (event, session) => {
+            if (event === "PASSWORD_RECOVERY") {
+                formUpdatePassword.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const password = document.getElementById('update-password').value;
+                    const passwordConfirm = document.getElementById('update-password-confirm').value;
+
+                    if (password.length < 6) { return showMessage('A nova senha deve ter no mínimo 6 caracteres.', 'error'); }
+                    if (password !== passwordConfirm) { return showMessage('As senhas não coincidem.', 'error'); }
+
+                    const { error } = await sb.auth.updateUser({ password });
+                    
+                    if (error) {
+                        showMessage(`Erro ao atualizar senha: ${error.message}`, 'error');
+                    } else {
+                        showMessage('Senha atualizada com sucesso! Redirecionando para o login...', 'success');
+                        setTimeout(() => {
+                            window.location.href = 'kanban.html'; // Redireciona para a página principal
+                        }, 2000);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
